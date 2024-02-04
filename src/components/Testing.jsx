@@ -5,24 +5,62 @@ Command: npx gltfjsx@6.2.16 src/assets/testing.glb
 
 import React, { useEffect, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
-import {RigidBody} from '@react-three/rapier'
+import {RigidBody,CapsuleCollider} from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
+import { useKeyboardControls } from '@react-three/drei'
 //1 and 5
-export default function Testing(props) {
+export default function Testing() {
   const rbr = useRef()
   const group =useRef()
+  const speed=50
+  const jump=1000
+  const impulse={x:0,y:0,z:0};
   const { nodes, materials, animations } = useGLTF('src/assets/testing.glb')
   const { actions,names } = useAnimations(animations, group)
   console.log(actions,names)
+  const forwardPressed=useKeyboardControls((state)=>state['forward'])
+  const leftwardPressed=useKeyboardControls((state)=>state['leftward'])
+  const backwardPressed=useKeyboardControls((state)=>state['backward'])
+  const rightwardPressed=useKeyboardControls((state)=>state['rightward'])
+  const jumpPressed=useKeyboardControls((state)=>state['jump'])
+  console.log(useKeyboardControls((state)=>state['forward']))
+
+  useFrame(()=>{
+    
+    if(forwardPressed){
+      actions[names[1]].play()
+      impulse.z+=speed
+      
+    }
+    if(backwardPressed){
+      actions[names[1]].play()
+      impulse.z-=speed
+      
+    }
+    if(leftwardPressed){
+      actions[names[1]].play()
+      impulse.x+=speed
+      
+    }
+    if(rightwardPressed){
+      actions[names[1]].play()
+      impulse.x-=speed
+      
+    }
+   
+    rbr.current.applyImpulse(impulse)
+  })
   useEffect(()=>{
-    actions[names[1]].fadeIn(.1).play()
-  },[])
+    rbr.current.applyImpulse({x:0,y:100,z:0})
+  },[jumpPressed])
  
   return (
-    <RigidBody colliders="hull" type='dynamic' ref={rbr}>
- <group  ref={group} {...props} dispose={null}>
+    <group>
+    <RigidBody type='dynamic' ref={rbr} enabledRotations={[false,false,false]} >
+        <CapsuleCollider args={[4,4]} position={[0,25,0]}>
+        <group  ref={group}  dispose={null} castShadow>
       <group name="Scene">
-        <group name="Armature" rotation={[Math.PI/2, 0, 0]} scale={0.1} position-y={5}>
+        <group name="Armature" rotation={[Math.PI/2, 0, 0]} scale={0.07} position-y={-8}>
           <primitive object={nodes.mixamorigHips} />
           <group name="Soldier">
             <skinnedMesh name="Cube002" geometry={nodes.Cube002.geometry} material={materials['skin.002']} skeleton={nodes.Cube002.skeleton} />
@@ -44,7 +82,10 @@ export default function Testing(props) {
         </group>
       </group>
     </group>
+          </CapsuleCollider>
+
     </RigidBody>
+    </group>
    
   )
 }
