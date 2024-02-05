@@ -6,3 +6,19 @@
   width: 1590px;
   height: 900px;
 }
+.btnContainer{
+  z-index: 20000000;
+  position: absolute;
+  bottom:0;
+  right: 0;
+  display: flex;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+
+}
+.btnContainer button{
+  cursor: pointer;
+  /* color: black; */
+  padding: 1rem;
+  /* background-color: transparent; */
+}

@@ -8,6 +8,7 @@ import { useGLTF, useAnimations } from '@react-three/drei'
 import {RigidBody,CapsuleCollider} from '@react-three/rapier'
 import { useFrame } from '@react-three/fiber'
 import { useKeyboardControls } from '@react-three/drei'
+import * as THREE from 'three'
 //1 and 5
 export default function Testing() {
   const rbr = useRef()
@@ -17,16 +18,15 @@ export default function Testing() {
   const impulse={x:0,y:0,z:0};
   const { nodes, materials, animations } = useGLTF('src/assets/testing.glb')
   const { actions,names } = useAnimations(animations, group)
-  console.log(actions,names)
+  const [getKeys,subscribeKeys]=useKeyboardControls()
   const forwardPressed=useKeyboardControls((state)=>state['forward'])
   const leftwardPressed=useKeyboardControls((state)=>state['leftward'])
   const backwardPressed=useKeyboardControls((state)=>state['backward'])
   const rightwardPressed=useKeyboardControls((state)=>state['rightward'])
   const jumpPressed=useKeyboardControls((state)=>state['jump'])
-  console.log(useKeyboardControls((state)=>state['forward']))
 
-  useFrame(()=>{
-    
+  useFrame((state,delta)=>{
+    const bodyPosition=rbr.current?.translation()
     if(forwardPressed){
       actions[names[1]].play()
       impulse.z+=speed
@@ -47,17 +47,39 @@ export default function Testing() {
       impulse.x-=speed
       
     }
-   
-    rbr.current.applyImpulse(impulse)
+    rbr.current?.applyImpulse(impulse)
+    // camera 3pv controls
+    const cameraPosition=new THREE.Vector3()
+    cameraPosition.copy(bodyPosition)
+    cameraPosition.z-=45
+    cameraPosition.y+=35
+
+    const cameraTarget=new THREE.Vector3()
+    cameraTarget.copy(bodyPosition)
+    cameraTarget.z+=-5
+    cameraTarget.y+=35
+
+    state.camera.position.copy(cameraPosition)
+    state.camera.lookAt(cameraTarget)
+
+
   })
+
   useEffect(()=>{
-    rbr.current.applyImpulse({x:0,y:100,z:0})
-  },[jumpPressed])
+   subscribeKeys(
+   (state)=>state.jump,
+   (value)=>{
+    if(value)
+    rbr.current?.applyImpulse({x:0,y:500,z:0})
+   }
+   )
+  },[])
+  
  
   return (
     <group>
     <RigidBody type='dynamic' ref={rbr} enabledRotations={[false,false,false]} >
-        <CapsuleCollider args={[4,4]} position={[0,25,0]}>
+        <CapsuleCollider args={[4,4]} position={[0,25,0]} friction={12}>
         <group  ref={group}  dispose={null} castShadow>
       <group name="Scene">
         <group name="Armature" rotation={[Math.PI/2, 0, 0]} scale={0.07} position-y={-8}>

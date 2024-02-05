@@ -40,15 +40,14 @@ function Walls2({position=[0,0,0]}){
 
 export default function Experience()
 {
-    const [animationNameIndex,setAnimationNameIndex]=useState(0)
     return <>
         <Physics debug>
         <OrbitControls makeDefault />
-        <directionalLight castShadow position={ [ 1, 2, 3 ] } intensity={ 1.5 } shadow-normalBias={ 0.04 } />
+        <directionalLight castShadow position={ [ 0, 35, 0 ] } intensity={ 1.5 } shadow-normalBias={ 0.04 } />
         <Environment preset='city' />
         <color attach={'background'} args={['ivory']}/>
 
-        <RigidBody type='fixed' friction={3}>
+        <RigidBody type='fixed' friction={12}>
         <mesh receiveShadow rotation-x={ - Math.PI * 0.5 } scale={2} position={[0,-1,0]}>
             <boxGeometry args={[100,100,1]}  />
             <meshStandardMaterial color="greenyellow" />
@@ -84,7 +83,7 @@ export default function Experience()
             <iframe src="https://planefolio-2-0.vercel.app/"></iframe>
         </Html>
        <Testing/>
-       
+    
         </Physics>
         
     </>
