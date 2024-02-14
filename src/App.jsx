@@ -40,13 +40,13 @@ function App() {
         <Experience />
     </Canvas>
       </KeyboardControls>
-     <div className='btnContainer'>
+     {/* <div className='btnContainer'>
       <button className='fwd'>Forward</button>
       <button className='bwd'>Backward</button>
       <button className='left'>Left</button>
       <button className='right'>Right</button>
 
-     </div>
+     </div> */}
     </main>
   )
 }
